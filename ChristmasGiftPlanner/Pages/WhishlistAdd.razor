@@ -1,0 +1,54 @@
+﻿@page "/add"
+@using Amazon.DynamoDBv2.DocumentModel
+@using Microsoft.Extensions.Logging
+@inject ILogger<WhishlistAdd> Logger
+<PageTitle>Adirectionm to whishlist</PageTitle>
+
+<h1>Add item to whishlist</h1>
+
+<EditForm Model="@whishListModel" OnValidSubmit="@HandleValidSubmit" style="display:flex; flex-direction:column; column-gap:10px; row-gap: 5px;"> 
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <label style="display:flex; flex-direction:column;">
+        Product Name:
+        <InputText DisplayName="Product Name" id="name" @bind-Value="whishListModel.Name" />    
+    </label>
+    <label style="display:flex; flex-direction:column;">
+        Product Url:
+        <InputText DisplayName="Product Url" id="url" @bind-Value="whishListModel.Url" />
+    </label>
+    <label style="display:flex; flex-direction:column;">
+        Image:
+        <InputFile DisplayName="Image" id="imgInput" @bind-Value="whishListModel.ImgUrl"></InputFile>
+    </label>
+
+    <button type="submit">Submit</button>
+</EditForm>
+
+
+@code {
+    private WhishlistModel whishListModel = new();
+
+    private EditContext? editContext;
+
+    protected override void OnInitialized()
+    {
+        editContext = new(whishListModel);
+    }
+    private async Task HandleValidSubmit()
+    {
+        Logger.LogInformation("HandleValidSubmit called");
+
+        var test = new Document();
+        test[nameof(WhishlistModel.UserName)] = "Lukas";
+        test[nameof(WhishlistModel.Name)] = whishListModel.Name;
+        test[nameof(WhishlistModel.Url)] = whishListModel.Url;
+        test[nameof(WhishlistModel.ImgUrl)] = whishListModel.ImgUrl;
+        Logger.LogInformation("HandleValidSubmit called");
+
+        await WhishlistService.WritingNewWhishlist_async(test);
+        // Process the valid form
+        await Task.CompletedTask;
+        // TODO: Add whishlist item
+    }
+}
